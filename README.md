@@ -13,7 +13,7 @@ The plugin also offers a library of [fixtures](#fixtures) that facilitate writin
 Currently, the plugin must be installed from source:
 
 ```
-pip install git+ssh://git@github.com/elastic/pytest-rally
+pip install git+ssh://git@github.com/NickDris/pytest-rally
 ```
 
 # Features
