@@ -52,6 +52,10 @@ def pytest_addoption(parser):
                     action="store_true",
                     default=False,
                     help=("If provided, Rally commands will just be logged, not executed."))
+    group.addoption("--track-filter",
+                    action="append",
+                    default=[],
+                    help="List of track names to filter tests (can be specified multiple times)")
 
 @pytest.hookimpl
 def pytest_cmdline_main(config):
