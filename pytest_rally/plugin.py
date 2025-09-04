@@ -72,9 +72,11 @@ def pytest_cmdline_main(config):
 
     repo = config.getoption("--track-repository", str(config.rootdir))
     rev = config.getoption("--track-revision", current_branch(repo))
-
+    tfilter = config.getoption("--track-filter", "")
+    
     config.option.track_repository = repo
     config.option.track_revision = rev
+    config.option.track_filter = tfilter
 
 def validate_options(config):
     if config.option.distribution_version and config.option.revision:
@@ -101,6 +103,8 @@ def default_params(track, challenge):
 
 @pytest.hookimpl
 def pytest_generate_tests(metafunc):
+    repo = metafunc.config.getoption('track_repository')
+    rev = metafunc.config.getoption('track_revision')
     tfilter = metafunc.config.getoption('track_filter')
     current_class = metafunc.cls
     desired_class = metafunc.config.option.test_class
