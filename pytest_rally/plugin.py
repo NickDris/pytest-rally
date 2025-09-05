@@ -73,11 +73,14 @@ def pytest_cmdline_main(config):
     repo = config.getoption("--track-repository", str(config.rootdir))
     rev = config.getoption("--track-revision", current_branch(repo))
     tfilter = config.getoption("--track-filter")
+    import logging
+    logging.getLogger(__name__).info(f"track_filter: {tfilter}")
+    logging.getLogger(__name__).info(f"tfilter split: {[t.strip() for t in tfilter.split(',') if t.strip()]}")
     if tfilter:
-        tfilter = [t.strip() for t in tfilter.split(",") if t.strip()]
+        tfilter = [t.strip() for t in tfilter.split(',') if t.strip()]
     else:
         tfilter = []
-
+    
     config.option.track_repository = repo
     config.option.track_revision = rev
     config.option.track_filter = tfilter
