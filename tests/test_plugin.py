@@ -17,42 +17,46 @@
 
 import pytest
 
-def test_generates_tests_from_list_tracks(pytester, example, temp_repo):
-    expected = [
-        "test_track_challenge[test-track-index-and-query]",
-        "test_track_challenge[test-track-index-only]",
-    ]
-    generated, _ = pytester.inline_genitems(example, f"--track-repository={temp_repo}")
-    assert [func.name for func in generated] == expected
+class TestPlugin:
+    # this should be sorted as per Rally list tracks output
+    tracks = ["test-track", "test-track2"]
+    challenges = ["index-and-query", "index-only"]
 
-def test_runs_correct_race_commands(caplog, temp_repo, run):
-    def expected_log_line(track, challenge):
-        command = (
-            f'esrally race --track="{track}" --challenge="{challenge}" '
-            f'--track-repository="{temp_repo}" --track-revision="main" '
-            '--configuration-name="pytest" --enable-assertions --kill-running-processes '
-            '--on-error="abort" --pipeline="benchmark-only" --target-hosts="127.0.0.1:19200" --test-mode'
-        )
+    def test_generates_tests_from_list_tracks(self, pytester, example, temp_repo):
+        expected = [
+            f"test_track_challenge[{track}-{challenge}]" for track in self.tracks for challenge in self.challenges
+        ]
+        generated, _ = pytester.inline_genitems(example, f"--track-repository={temp_repo}")
+        assert [func.name for func in generated] == expected
 
-        return ("pytest_rally.rally", "INFO", f'Running command: [{command}]')
+    def test_runs_correct_race_commands(self, caplog, temp_repo, run):
+        def expected_log_line(track, challenge):
+            command = (
+                f'esrally race --track="{track}" --challenge="{challenge}" '
+                f'--track-repository="{temp_repo}" --track-revision="main" '
+                '--configuration-name="pytest" --enable-assertions --kill-running-processes '
+                '--on-error="abort" --pipeline="benchmark-only" --target-hosts="127.0.0.1:19200" --test-mode'
+            )
 
-    challenges = [
-        "index-and-query",
-        "index-only",
-    ]
+            return ("pytest_rally.rally", "INFO", f'Running command: [{command}]')
 
-    expected = [expected_log_line("test-track", challenge) for challenge in challenges]
-    res = run()
-    actual = [(r.name, r.levelname, r.message) for r in caplog.records if "esrally race" in r.message]
-    assert actual == expected
+        challenges = [
+            "index-and-query",
+            "index-only",
+        ]
 
-def test_runs_correct_install_command(caplog, temp_repo, run):
-    expected = [
-        ("pytest_rally.elasticsearch", "DEBUG", 'Installing Elasticsearch: '
-         '[esrally install --quiet --http-port=19200 --node=rally-node --master-nodes=rally-node '
-         '--car=4gheap,trial-license,x-pack-ml,lean-watermarks --seed-hosts="127.0.0.1:19300" '
-         '--revision=current]')
-    ]
-    res = run()
-    actual = [(r.name, r.levelname, r.message) for r in caplog.records if "esrally install" in r.message]
-    assert actual == expected
+        expected = [expected_log_line(track, challenge) for track in self.tracks for challenge in challenges]
+        res = run()
+        actual = [(r.name, r.levelname, r.message) for r in caplog.records if "esrally race" in r.message]
+        assert actual == expected
+
+    def test_runs_correct_install_command(self, caplog, temp_repo, run):
+        expected = [
+            ("pytest_rally.elasticsearch", "DEBUG", 'Installing Elasticsearch: '
+            '[esrally install --quiet --http-port=19200 --node=rally-node --master-nodes=rally-node '
+            '--car=4gheap,trial-license,x-pack-ml,lean-watermarks --seed-hosts="127.0.0.1:19300" '
+            '--revision=current]')
+        ]
+        res = run()
+        actual = [(r.name, r.levelname, r.message) for r in caplog.records if "esrally install" in r.message]
+        assert actual == expected
