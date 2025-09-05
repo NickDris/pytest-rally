@@ -77,7 +77,7 @@ def pytest_cmdline_main(config):
         tfilter = [t.strip() for t in tfilter.split(",") if t.strip()]
     else:
         tfilter = []
-        
+
     config.option.track_repository = repo
     config.option.track_revision = rev
     config.option.track_filter = tfilter
