@@ -53,9 +53,9 @@ def pytest_addoption(parser):
                     default=False,
                     help=("If provided, Rally commands will just be logged, not executed."))
     group.addoption("--track-filter",
-                    action="append",
-                    default=[],
-                    help="List of track names to filter tests (can be specified multiple times)")
+                    action="store",
+                    default="",
+                    help="Comma-separated list of track names to filter tests with (e.g., --track-filter=track1,track2)")
 
 @pytest.hookimpl
 def pytest_cmdline_main(config):
@@ -72,8 +72,12 @@ def pytest_cmdline_main(config):
 
     repo = config.getoption("--track-repository", str(config.rootdir))
     rev = config.getoption("--track-revision", current_branch(repo))
-    tfilter = config.getoption("--track-filter", "")
-    
+    tfilter = config.getoption("--track-filter")
+    if tfilter:
+        tfilter = [t.strip() for t in tfilter.split(",") if t.strip()]
+    else:
+        tfilter = []
+
     config.option.track_repository = repo
     config.option.track_revision = rev
     config.option.track_filter = tfilter
@@ -115,7 +119,6 @@ def pytest_generate_tests(metafunc):
             params = []
             tracks_and_challenges = r.all_tracks_and_challenges()
             for track, challenges in tracks_and_challenges:
-                # Filter tracks using tfilter
                 if not tfilter or track in tfilter:
                     params += [(default_params(track, challenge)) for challenge in challenges]
             metafunc.parametrize("track,challenge,rally_options", params)
