@@ -45,6 +45,6 @@ def es_cluster(request, distribution_version, revision):
     yield cluster
     cluster.stop()
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def track_filter(pytestconfig):
     return pytestconfig.getoption("track_filter")
