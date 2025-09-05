@@ -60,3 +60,16 @@ class TestPlugin:
         res = run()
         actual = [(r.name, r.levelname, r.message) for r in caplog.records if "esrally install" in r.message]
         assert actual == expected
+
+    def test_track_filter_limits_tracks(self, pytester, example, temp_repo):
+        # Only "test-track2" should be included when filtered
+        generated, _ = pytester.inline_genitems(
+            example,
+            f"--track-repository={temp_repo}",
+            "--track-filter=test-track2"
+        )
+        expected = [
+            f"test_track_challenge[test-track2-index-and-query]",
+            f"test_track_challenge[test-track2-index-only]",
+        ]
+        assert [func.name for func in generated] == expected
