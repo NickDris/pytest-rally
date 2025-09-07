@@ -20,7 +20,7 @@ from setuptools import setup
 setup(
     name="pytest-rally",
     packages=["pytest_rally"],
-    version="0.0.1",
+    version="0.0.2",
     include_package_data=True,
     entry_points={"pytest11": ["name_of_plugin = pytest_rally.plugin"]},
     classifiers=["Framework :: Pytest"],
