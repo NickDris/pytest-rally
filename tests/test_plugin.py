@@ -16,6 +16,7 @@
 # under the License.
 
 import pytest
+import re
 
 class TestPlugin:
     # this should be sorted as per Rally list tracks output
@@ -62,14 +63,35 @@ class TestPlugin:
         assert actual == expected
 
     def test_track_filter_limits_tracks(self, pytester, example, temp_repo):
-        # Only "test-track2" should be included when filtered
-        generated, _ = pytester.inline_genitems(
-            example,
-            f"--track-repository={temp_repo}",
-            "--track-filter=test-track2"
-        )
-        expected = [
-            f"test_track_challenge[test-track2-index-and-query]",
-            f"test_track_challenge[test-track2-index-only]",
-        ]
-        assert [func.name for func in generated] == expected
+        def expected_test_names(track_filter):
+            filter_items = [t.strip() for t in track_filter.split(",")]
+            return [
+                f"test_track_challenge[{track}-{challenge}]"
+                for track in self.tracks if track in filter_items
+                for challenge in self.challenges
+            ]
+        
+        test_track_filters = ["test-track2", "test-track2,test-track"]
+        for track_filter in test_track_filters:
+            expected = expected_test_names(track_filter)
+            generated, _ = pytester.inline_genitems(
+                example,
+                f"--track-repository={temp_repo}",
+                f"--track-filter={track_filter}"
+            )
+            assert [func.name for func in generated] == expected
+
+    def test_track_marker_skipping(self, caplog, temp_repo, run_with_filter):
+        track_filters = ["test-track2", "test-track2,test-track"]
+        for track_filter in track_filters:
+            caplog.clear()
+            run_function = run_with_filter(track_filter)
+            races = [r for r in caplog.records if "esrally race" in r.message]
+            raced_tracks = []
+            for r in races:
+                match = re.search(r'--track="([^"]+)"', r.message)
+                if match:
+                    raced_tracks.append(match.group(1))
+            expected_tracks = set(track_filter.split(","))
+            actual_tracks = set(raced_tracks)
+            assert actual_tracks == expected_tracks, f"Expected tracks {expected_tracks}, but got {actual_tracks}"
