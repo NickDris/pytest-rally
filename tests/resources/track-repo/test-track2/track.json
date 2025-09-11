@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "description": "Track 2for testing pytest-rally",
+  "description": "Track 2 for testing pytest-rally",
   "indices": [
     {
       "name": "test",
