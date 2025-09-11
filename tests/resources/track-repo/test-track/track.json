@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "description": "Skeleton track for testing pytest-rally",
+  "description": "Track 1 for testing pytest-rally",
   "indices": [
     {
       "name": "test",
