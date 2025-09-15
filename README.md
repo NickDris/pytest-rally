@@ -358,5 +358,6 @@ python -mvenv .venv
 source .venv/bin/activate
 # provide full path to Rally source repository
 pip install -e "/<full-path>/rally[develop]"
+pip install -e .
 pytest
 ```

@@ -34,33 +34,6 @@ def repo(resources):
     yield Path(resources).joinpath("track-repo")
 
 @pytest.fixture(scope="function", autouse=True)
-def make_conftest(pytester, repo):
-    conftest_str = """
-    import pytest
-
-    def pytest_addoption(parser):
-        group = parser.getgroup("rally")
-        group.addoption("--track-repository", action="store", default=None)
-        group.addoption("--track-revision", action="store", default="main")
-
-    # Using the plugin's pytest_runtest_setup hook equivalent in order to skip tests based on track markers.
-    # This is a workaround since plugin's pytest_runtest_setup is not called for tests inside pytester.
-    @pytest.hookimpl
-    def pytest_collection_modifyitems(session, config, items):
-        for item in items:
-            track_filter = item.config.getoption("track_filter")
-            if track_filter:
-                track_marker = item.get_closest_marker("track")
-                if track_marker:
-                    marker_tracks = track_marker.args[0]
-                    if isinstance(marker_tracks, str):
-                        marker_tracks = [marker_tracks]
-                    if not any(track in track_filter for track in marker_tracks):
-                        item.add_marker(pytest.mark.skip(reason=f"Skipping test for track {item.name} with marker {marker_tracks} not in track_filter {track_filter}"))
-    """
-    pytester.makeconftest(conftest_str)
-
-@pytest.fixture(scope="function", autouse=True)
 def temp_repo(pytester, repo):
     temp_repo = pytester.mkdir("track-repo")
     copytree(repo, temp_repo, dirs_exist_ok=True)
@@ -81,7 +54,7 @@ def run(pytester, temp_repo, example):
     yield partial(pytester.runpytest, "--debug-rally", f"--track-repository={temp_repo}", example["all-tracks-and-challenges"])
 
 @pytest.fixture(scope="function")
-def run_with_filter(pytester, temp_repo, example):
+def run_with_filter(pytester, temp_repo):
     def _run_with_filter(track_filter, test_module):
         return pytester.runpytest(
             "--debug-rally",

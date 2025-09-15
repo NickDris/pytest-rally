@@ -22,6 +22,6 @@ setup(
     packages=["pytest_rally"],
     version="0.0.2",
     include_package_data=True,
-    entry_points={"pytest11": ["name_of_plugin = pytest_rally.plugin"]},
+    entry_points={"pytest11": ["rally = pytest_rally.plugin"]},
     classifiers=["Framework :: Pytest"],
 )
