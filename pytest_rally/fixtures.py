@@ -44,4 +44,3 @@ def es_cluster(request, distribution_version, revision):
     cluster.start()
     yield cluster
     cluster.stop()
-

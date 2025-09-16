@@ -45,13 +45,16 @@ def temp_repo(pytester, repo):
 
 @pytest.fixture(scope="function")
 def example(pytester):
-    all_tracks_and_challenges = pytester.copy_example("all_tracks_and_challenges.py")
-    marked_tracks = pytester.copy_example("marked_tracks.py")
-    yield {"all-tracks-and-challenges": all_tracks_and_challenges, "marked-tracks": marked_tracks}
+    examples_dir = Path(__file__).parent.joinpath("examples")
+    example_files = examples_dir.glob("*.py")
+    examples={}
+    for f in example_files:
+        examples.update({f.name[:-3]: pytester.copy_example(f.name)})
+    yield examples
 
 @pytest.fixture(scope="function")
 def run(pytester, temp_repo, example):
-    yield partial(pytester.runpytest, "--debug-rally", f"--track-repository={temp_repo}", example["all-tracks-and-challenges"])
+    yield partial(pytester.runpytest, "--debug-rally", f"--track-repository={temp_repo}", example["all_tracks_and_challenges"])
 
 @pytest.fixture(scope="function")
 def run_with_filter(pytester, temp_repo):

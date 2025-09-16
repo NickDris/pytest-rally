@@ -18,6 +18,9 @@
 import pytest
 import re
 
+# metafunc.parametrize returns this string when given an empty list. 
+# Ref1: https://github.com/elastic/pytest-rally/blob/60042c441fc0ca2d6aafe0e298fd7f08e3c30334/pytest_rally/plugin.py#L134
+# Ref2: https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest.Metafunc.parametrize
 DEFAULT_TRACK_AND_CHALLENGE="track0-challenge0-rally_options0"
 
 class TestPlugin:
@@ -29,7 +32,7 @@ class TestPlugin:
         expected = [
             f"test_track_challenge[{track}-{challenge}]" for track in self.tracks for challenge in self.challenges
         ]
-        generated, _ = pytester.inline_genitems(example["all-tracks-and-challenges"], f"--track-repository={temp_repo}")
+        generated, _ = pytester.inline_genitems(example["all_tracks_and_challenges"], f"--track-repository={temp_repo}")
         assert [func.name for func in generated] == expected
 
     def test_runs_correct_race_commands(self, caplog, temp_repo, run):
@@ -81,7 +84,7 @@ class TestPlugin:
         for track_filter in test_track_filters:
             expected = expected_test_names(track_filter)
             generated, _ = pytester.inline_genitems(
-                example["all-tracks-and-challenges"],
+                example["all_tracks_and_challenges"],
                 f"--track-repository={temp_repo}",
                 f"--track-filter={track_filter}"
             )
@@ -95,7 +98,7 @@ class TestPlugin:
         test_track_filters = ["", "test-track2", "test-track2,test-track", "test-track500"]
         for track_filter in test_track_filters:
             caplog.clear()
-            run_function = run_with_filter(track_filter, example["marked-tracks"])
+            run_function = run_with_filter(track_filter, example["marked_tracks"])
             races = [r for r in caplog.records if "esrally race" in r.message]
             raced_tracks_challenges_dict = {}
             for r in races:

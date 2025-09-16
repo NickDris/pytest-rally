@@ -17,6 +17,9 @@
 
 import pytest
 
+# Marks at module level for tests with track filters that doesn't include the listed track names 
+pytestmark = pytest.mark.track("test-track", "test-track2", "test-track3")
+
 class TestMarkedFunctions:
     @pytest.mark.track("test-track","test-track2")
     def test_mark_track(self, es_cluster, rally):
@@ -26,6 +29,17 @@ class TestMarkedFunctions:
     @pytest.mark.track("test-track2")
     def test_mark_track2(self, es_cluster, rally):
         rally.race(track="test-track2",challenge="cluster-health")
+
+    @pytest.mark.track("test-track3")
+    def test_mark_track3(self, es_cluster, rally):
+        rally.race(track="test-track3",challenge="index-only")
+
+@pytest.mark.track("test-track")
+class TestMarkedClass:
+    @pytest.mark.track("test-track","test-track2")
+    def test_mark_track(self, es_cluster, rally):
+        rally.race(track="test-track",challenge="index-only")
+        rally.race(track="test-track2",challenge="force-merge")
 
     @pytest.mark.track("test-track3")
     def test_mark_track3(self, es_cluster, rally):
