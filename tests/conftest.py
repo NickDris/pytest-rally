@@ -34,31 +34,35 @@ def repo(resources):
     yield Path(resources).joinpath("track-repo")
 
 @pytest.fixture(scope="function", autouse=True)
-def make_conftest(pytester, repo):
-    conftest_str = """
-    import pytest
-
-    def pytest_addoption(parser):
-        group = parser.getgroup("rally")
-        group.addoption("--track-repository", action="store", default=None)
-        group.addoption("--track-revision", action="store", default="main")
-    """
-    pytester.makeconftest(conftest_str)
-
-@pytest.fixture(scope="function", autouse=True)
 def temp_repo(pytester, repo):
     temp_repo = pytester.mkdir("track-repo")
     copytree(repo, temp_repo, dirs_exist_ok=True)
     prefix = f"git -C {temp_repo}"
-    commands = ["init", "add .", "commit -am 'test'"]
+    commands = ["init -b main", "add .", "commit -am 'test'"]
     for command in commands:
         run_command_with_return_code(f"{prefix} {command}")
     yield temp_repo
 
 @pytest.fixture(scope="function")
 def example(pytester):
-    yield pytester.copy_example("race.py")
+    examples_dir = Path(__file__).parent.joinpath("examples")
+    example_files = examples_dir.glob("*.py")
+    examples={}
+    for f in example_files:
+        examples.update({f.name[:-3]: pytester.copy_example(f.name)})
+    yield examples
 
 @pytest.fixture(scope="function")
 def run(pytester, temp_repo, example):
-    yield partial(pytester.runpytest, "--debug-rally", f"--track-repository={temp_repo}", example)
+    yield partial(pytester.runpytest, "--debug-rally", f"--track-repository={temp_repo}", example["all_tracks_and_challenges"])
+
+@pytest.fixture(scope="function")
+def run_with_filter(pytester, temp_repo):
+    def _run_with_filter(track_filter, test_module):
+        return pytester.runpytest(
+            "--debug-rally",
+            f"--track-repository={temp_repo}",
+            f"--track-filter={track_filter}",
+            test_module
+        )
+    yield _run_with_filter
