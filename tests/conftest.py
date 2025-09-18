@@ -53,16 +53,13 @@ def example(pytester):
     yield examples
 
 @pytest.fixture(scope="function")
-def run(pytester, temp_repo, example):
-    yield partial(pytester.runpytest, "--debug-rally", f"--track-repository={temp_repo}", example["all_tracks_and_challenges"])
-
-@pytest.fixture(scope="function")
-def run_with_filter(pytester, temp_repo):
-    def _run_with_filter(track_filter, test_module):
+def run(pytester, temp_repo):
+    def _run(module, *args):
         return pytester.runpytest(
             "--debug-rally",
             f"--track-repository={temp_repo}",
-            f"--track-filter={track_filter}",
-            test_module
+            *args,
+            module,
         )
-    yield _run_with_filter
+    yield _run
+
