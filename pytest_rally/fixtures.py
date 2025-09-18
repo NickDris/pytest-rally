@@ -26,7 +26,10 @@ def distribution_version(request):
 
 @pytest.fixture(scope="module")
 def revision(request):
-    return request.config.option.revision
+    # revision has the peculiarity of being None by default, to facilitate the validation of 
+    # mutually exclusive options in pytest_addoption. However, we want to set that to "current"
+    # to match Rally's default behavior, if not provided by the user.
+    return request.config.option.revision if request.config.option.revision else "current"
 
 @pytest.fixture(scope="class")
 def rally(request):
@@ -39,7 +42,7 @@ def es_cluster(request, distribution_version, revision):
     dist = distribution_version
     rev = revision
     debug = request.config.option.debug_rally
-    cluster = TestCluster(distribution_version=dist, debug=debug)
+    cluster = TestCluster(distribution_version=dist, revision=rev, debug=debug)
     cluster.install()
     cluster.start()
     yield cluster
