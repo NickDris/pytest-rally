@@ -31,7 +31,7 @@ def revision(request):
     # to match Rally's default behavior, if not provided by the user.
     return request.config.option.revision if request.config.option.revision else "current"
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def rally(request):
     r = request.config.option.rally
     yield r
