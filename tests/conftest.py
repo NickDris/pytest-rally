@@ -38,7 +38,7 @@ def temp_repo(pytester, repo):
     temp_repo = pytester.mkdir("track-repo")
     copytree(repo, temp_repo, dirs_exist_ok=True)
     prefix = f"git -C {temp_repo}"
-    commands = ["init -b main", "add .", "commit -am test"]
+    commands = ["init -b main", "add .", "commit -am 'test'"]
     for command in commands:
         run_command_with_return_code(f"{prefix} {command}")
     yield temp_repo
