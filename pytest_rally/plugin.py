@@ -86,7 +86,7 @@ def pytest_cmdline_main(config):
         rev = current_branch(repo)
     tfilter = config.getoption("--track-filter")
     if tfilter:
-        # We are currently matching with marks using only the top-level track (e.g. elastic/logs will match elastic )
+        # We are currently filtering marks using only the top-level track (e.g. elastic/logs will include every track marked with elastic*)
         tfilter = [t.strip().split("/")[0] for t in tfilter.split(",") if t.strip()]
     else:
         tfilter = []
