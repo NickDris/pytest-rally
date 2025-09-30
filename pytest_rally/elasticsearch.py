@@ -29,14 +29,14 @@ import uuid
 class TestCluster:
     def __init__(self,
                  distribution_version=None,
-                 revision="current",
+                 revision=None,
                  http_port=19200,
                  node_name="rally-node",
                  car="4gheap,trial-license,x-pack-ml,lean-watermarks",
                  debug=False):
         self.installation_id = None
         self.distribution_version = distribution_version
-        self.revision = revision
+        self.revision = "current" if not revision else revision
         self.http_port = http_port
         self.transport_port = http_port + 100
         self.node_name = node_name

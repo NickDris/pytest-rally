@@ -35,7 +35,7 @@ class TestPlugin:
         generated, _ = pytester.inline_genitems(example["all_tracks_and_challenges"], f"--track-repository={temp_repo}")
         assert [func.name for func in generated] == expected
 
-    def test_runs_correct_race_commands(self, caplog, temp_repo, run):
+    def test_runs_correct_race_commands(self, caplog, temp_repo, run, example):
         def expected_log_line(track, challenge):
             command = (
                 f'esrally race --track="{track}" --challenge="{challenge}" '
@@ -52,18 +52,19 @@ class TestPlugin:
         ]
 
         expected = [expected_log_line(track, challenge) for track in self.tracks for challenge in challenges]
-        res = run()
+        res = run(example["all_tracks_and_challenges"])
         actual = [(r.name, r.levelname, r.message) for r in caplog.records if "esrally race" in r.message]
         assert actual == expected
 
-    def test_runs_correct_install_command(self, caplog, temp_repo, run):
+    def test_runs_correct_install_command(self, caplog, temp_repo, distribution_version, revision, run, example):
+        install_option = f'--distribution-version={distribution_version}' if distribution_version else f'--revision={revision}'
         expected = [
             ("pytest_rally.elasticsearch", "DEBUG", 'Installing Elasticsearch: '
             '[esrally install --quiet --http-port=19200 --node=rally-node --master-nodes=rally-node '
-            '--car=4gheap,trial-license,x-pack-ml,lean-watermarks --seed-hosts="127.0.0.1:19300" '
-            '--revision=current]')
+            f'--car=4gheap,trial-license,x-pack-ml,lean-watermarks --seed-hosts="127.0.0.1:19300" '
+            f'{install_option}]')
         ]
-        res = run()
+        res = run(example["all_tracks_and_challenges"], install_option)
         actual = [(r.name, r.levelname, r.message) for r in caplog.records if "esrally install" in r.message]
         assert actual == expected
 
@@ -95,7 +96,7 @@ class TestPlugin:
             )
             assert [func.name for func in generated] == expected
 
-    def test_track_filter_skips_tracks(self, caplog, temp_repo, example, run_with_filter):
+    def test_track_filter_skips_tracks(self, caplog, temp_repo, example, run):
         def expected_tracks_filtered(track_filter):
             result = set()
             filter_items = None if track_filter == "" else [t.strip().split("/")[0] for t in track_filter.split(",")]
@@ -111,7 +112,7 @@ class TestPlugin:
         test_track_filters = ["", "test-track2", "test-track2,test-track", "test-track500", "many-tracks", "many-tracks/sub-track"]
         for track_filter in test_track_filters:
             caplog.clear()
-            run_function = run_with_filter(track_filter, example["marked_tracks"])
+            run_function = run(example["marked_tracks"], f"--track-filter={track_filter}")
             races = [r for r in caplog.records if "esrally race" in r.message]
             raced_tracks = []
             for r in races:
