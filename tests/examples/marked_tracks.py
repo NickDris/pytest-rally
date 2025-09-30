@@ -42,11 +42,11 @@ class TestMarkedClass:
     def test_mark_track3(self, es_cluster, rally):
         rally.race(track="test-track3",challenge="index-only")
 
-@pytest.mark.track("many-tracks")
 class TestMarkedClassSubTrack:
+    @pytest.mark.track("many-tracks/sub-track")
     def test_mark_sub_track(self, es_cluster, rally):
         rally.race(track="many-tracks/sub-track",challenge="index-only")
-        rally.race(track="many-tracks/sub-track2",challenge="index-only")
 
+    @pytest.mark.track("many-tracks/sub-track2")
     def test_mark_sub_track2(self, es_cluster, rally):
         rally.race(track="many-tracks/sub-track2",challenge="index-only")
