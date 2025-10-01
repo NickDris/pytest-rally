@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "description": "Track 3 for testing pytest-rally",
+  "description": "Track 2 for testing pytest-rally",
   "indices": [
     {
       "name": "test",
@@ -9,7 +9,7 @@
   ],
   "corpora": [
     {
-      "name": "test-track3",
+      "name": "sub-track2",
       "documents": [
         {
           "source-file": "documents.json",

@@ -18,7 +18,7 @@
         "type": "double"
       },
       "country_code": {
-        "type": "text"
+        "type": "double"
       },
       "population": {
         "type": "long"
