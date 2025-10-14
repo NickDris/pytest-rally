@@ -56,8 +56,10 @@ class TestPlugin:
         actual = [(r.name, r.levelname, r.message) for r in caplog.records if "esrally race" in r.message]
         assert actual == expected
 
-    def test_runs_correct_install_command(self, caplog, temp_repo, distribution_version, revision, run, example):
+    def test_runs_correct_install_command(self, caplog, temp_repo, distribution_version, revision, source_build_release, run, example):
         install_option = f'--distribution-version={distribution_version}' if distribution_version else f'--revision={revision}'
+        if '--revision' in install_option and source_build_release:
+            install_option += ' --source-build-release'
         expected = [
             ("pytest_rally.elasticsearch", "DEBUG", 'Installing Elasticsearch: '
             '[esrally install --quiet --http-port=19200 --node=rally-node --master-nodes=rally-node '
@@ -65,6 +67,8 @@ class TestPlugin:
             f'{install_option}]')
         ]
         res = run(example["all_tracks_and_challenges"], install_option)
+        commands = [r for r in caplog.records]
+        print("\n".join([f"{c.levelname}: {c.message}" for c in commands]))
         actual = [(r.name, r.levelname, r.message) for r in caplog.records if "esrally install" in r.message]
         assert actual == expected
 

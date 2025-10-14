@@ -30,6 +30,7 @@ class TestCluster:
     def __init__(self,
                  distribution_version=None,
                  revision=None,
+                 source_build_release=False,
                  http_port=19200,
                  node_name="rally-node",
                  car="4gheap,trial-license,x-pack-ml,lean-watermarks",
@@ -37,6 +38,7 @@ class TestCluster:
         self.installation_id = None
         self.distribution_version = distribution_version
         self.revision = "current" if not revision else revision
+        self.source_build_release = source_build_release
         self.http_port = http_port
         self.transport_port = http_port + 100
         self.node_name = node_name
@@ -73,6 +75,8 @@ class TestCluster:
             cmd += f" --distribution-version={self.distribution_version}"
         else:
             cmd += f" --revision={self.revision}"
+            if self.source_build_release is True:
+                cmd += " --source-build-release"
 
         self.logger.debug("Installing Elasticsearch: [%s]", cmd)
 
