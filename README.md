@@ -297,7 +297,7 @@ Note that state (indices, settings, etc.) is not reset between tests.
 
 ## Filter tests based on tracks
 
-Marking classes, functions or modules with @pytest.mark.track("track_name") like the following test class member 
+Marking classes, functions or modules with `@pytest.mark.track("track_name")` like the following test class member 
 
 ``` python
 class TestCustomParameters:
@@ -309,7 +309,7 @@ class TestCustomParameters:
         )
         assert ret == 0
 ```
-can be used for the --track-filter option. If given that option with a comma-separated list of track-names
+can be used for the `--track-filter` option. If given that option with a comma-separated list of track-names
 pytest will generate tests only for those tracks.
 
 ### Example
@@ -318,7 +318,7 @@ pytest will generate tests only for those tracks.
 
 will skip the tests for security because they are marked to be using the 'elastic/security' track, while 
 testing custom parameters only contains a function marked to be using 'tsdb' track which is included in the 
---track-filter option.
+`--track-filter` option.
 
 ```
 ========================================================= test session starts ==========================================================
@@ -347,9 +347,9 @@ INFO     pytest_rally.elasticsearch:elasticsearch.py:104 Stopping Elasticsearch:
 ==================================================== 1 passed, 4 skipped in 40.22s =====================================================
 ```
 
-In the case the --track-filter contains a top-level track name e.g. elastic, or elastic/logs, all tests marked with this top-level e.g. elastic, elastic/logs, elastic/security will be executed.
+In the case the `--track-filter` contains a top-level track folder e.g. `elastic`, all tracks in that folder are included e.g. `elastic/logs`, `elastic/security` and `elastic/apm`.
 
-Note that in the case of multi-level marking (We mark both a test class and a test function within that class), the closest marker (e.g. marker to function) will take precedence over the farther marker (e.g. module) and will be matched against the --track-filter items.
+Note that in the case of multi-level marking (We mark both a test class and a test function within that class), the closest marker (e.g. marker to function) will take precedence over the farther marker (e.g. module) and will be matched against the `--track-filter` items.
 
 ## Build options
 
